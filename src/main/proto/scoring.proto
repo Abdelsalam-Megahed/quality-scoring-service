@@ -1,0 +1,53 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package org.baeldung.grpc;
+
+message HelloRequest {
+  string firstName = 1;
+  string lastName = 2;
+}
+
+message HelloResponse {
+  string greeting = 1;
+}
+
+message Period {
+  string startDate = 1;
+  string endDate = 2;
+}
+
+message CategoryScore {
+  string category = 1;
+  int32 ratings = 2;
+  int32 score = 4;
+  repeated Date dates = 3; //can be a date or a week
+}
+
+message Date {
+  string date = 1;
+  int32 score = 2;
+}
+
+message CategoryScoreResponse {
+  repeated CategoryScore categoryScoreList = 1;
+}
+
+message ScoresByTicket {
+  int32 ticketId = 1;
+  repeated Category categories = 2;
+}
+
+message Category {
+  string category = 1;
+  int32 score = 2;
+}
+
+message ScoresByTicketResponse {
+  repeated ScoresByTicket scoresByTicketList = 1;
+}
+
+service ScoringService {
+  rpc hello(HelloRequest) returns(HelloResponse);
+  rpc getCategoryScore(Period) returns (CategoryScoreResponse);
+  rpc getScoresByTicket(Period) returns (ScoresByTicketResponse);
+}
