@@ -17,7 +17,5 @@ public class DateUtils {
     public static boolean isPeriodLongerThanOneMonth(LocalDate startDate, LocalDate endDate) {
         return startDate.isBefore(endDate.minusMonths(1));
     }
-
-
 }
 

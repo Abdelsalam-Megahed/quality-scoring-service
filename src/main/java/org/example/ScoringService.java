@@ -3,15 +3,16 @@ package org.example;
 import org.baeldung.grpc.CategoryScore;
 import org.baeldung.grpc.CategoryScoreResponse;
 import org.baeldung.grpc.Date;
+import org.baeldung.grpc.Week;
 import org.example.models.Rating;
+import org.example.utils.DateUtils;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.time.DayOfWeek.MONDAY;
 
 public class ScoringService {
     private final Connection connection;
@@ -21,14 +22,10 @@ public class ScoringService {
     }
 
     public CategoryScoreResponse getAggregatedCategoryScore(String requestStartDate, String requestEndDate) {
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startDate = LocalDate.parse(requestStartDate, dateFormat);
-        LocalDate endDate = LocalDate.parse(requestEndDate, dateFormat);
-
+        LocalDate startDate = LocalDate.parse(requestStartDate, DateUtils.getDateFormat());
+        LocalDate endDate = LocalDate.parse(requestEndDate, DateUtils.getDateFormat());
         List<Rating> ratings = getRatingsFromDB(startDate, endDate);
-
         Map<String, List<Rating>> groupedRatings = ratings.stream().collect(Collectors.groupingBy(Rating::getCategory));
-
         List<CategoryScore> categoryScoreList = groupedRatings.entrySet().stream().map((ratingGroup) -> {
             List<Date> dates = ratingGroup.getValue().stream()
                     .map(rating -> Date.newBuilder()
@@ -36,14 +33,17 @@ public class ScoringService {
                             .setScore(calculateScore(rating.getWeight(), rating.getRating()))
                             .build())
                     .collect(Collectors.toList());
+            List<Week> weeklyList = new ArrayList<>();
+            List<Date> dailyList = new ArrayList<>();
+            boolean isPeriodLongerThanOneMonth = DateUtils.isPeriodLongerThanOneMonth(startDate, endDate);
 
-            List<Date> finalDatesPerCategory = aggregateDailyScores(dates);
-
-            if (isPeriodLongerThanOneMonth(startDate, endDate)) {
-                aggregateWeeklyScores(finalDatesPerCategory);
+            if (isPeriodLongerThanOneMonth) {
+                weeklyList = aggregateWeeklyScores(dates);
+            } else {
+                dailyList = aggregateDailyScores(dates);
             }
 
-            int overallAverageScore = getAverageScore(finalDatesPerCategory);
+            int overallAverageScore = getAverageScore(dailyList);
             int overallRating = ratingGroup.getValue().stream()
                     .reduce(0, (total, rating) -> total + rating.getRating(), Integer::sum);
 
@@ -51,7 +51,8 @@ public class ScoringService {
                     .setCategory(ratingGroup.getKey())
                     .setScore(overallAverageScore)
                     .setRatings(overallRating)
-                    .addAllDates(finalDatesPerCategory)
+                    .addAllDates(isPeriodLongerThanOneMonth ? new ArrayList<>() : dailyList)
+                    .addAllWeeks(weeklyList)
                     .build();
         }).collect(Collectors.toList());
 
@@ -62,7 +63,7 @@ public class ScoringService {
 
     private List<Date> aggregateDailyScores(List<Date> dates) {
         Map<String, List<Date>> groupedDatesByWeek = dates.stream().collect(
-                Collectors.groupingBy(date -> date.getDate()));
+                Collectors.groupingBy(Date::getDate));
 
         return groupedDatesByWeek.entrySet().stream().map(dateGroup -> Date.newBuilder()
                 .setDate(dateGroup.getKey())
@@ -70,29 +71,21 @@ public class ScoringService {
                 .build()).collect(Collectors.toList());
     }
 
-    private List<Date> aggregateWeeklyScores(List<Date> dates) {
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        List<Date> weeklyDates = new ArrayList<>();
-        Map<String, List<Integer>> map = new HashMap<>();
+    private List<Week> aggregateWeeklyScores(List<Date> dates) {
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfYear();
 
-        for (Date dateObject : dates) {
-            List<Integer> scores = new ArrayList<>();
+        Map<Integer, List<Date>> groupedDatesByWeek = dates.stream().collect(Collectors.groupingBy(
+                date -> LocalDate.parse(date.getDate()).get(weekOfYear),
+                LinkedHashMap::new,
+                Collectors.toList()
+        ));
 
-            if (isFirstRatingOrStartOfWeek(dateObject.getDate())) {
-//                map.put(dateObject.getDate(), scores.add(dateObject.getScore()));
-            }
-
-        }
-
-        return weeklyDates;
-    }
-
-    private boolean isFirstRatingOrStartOfWeek(String date) {
-        return date == null || isStartOfWeek(LocalDate.parse(date));
-    }
-
-    public boolean isPeriodLongerThanOneMonth(LocalDate startDate, LocalDate endDate) {
-        return startDate.isBefore(endDate.minusMonths(1));
+        return groupedDatesByWeek.entrySet().stream().map(weekAndDates -> Week.newBuilder()
+                        .setWeek(String.valueOf(weekAndDates.getKey()))
+                        .setScore(getAverageScore(weekAndDates.getValue()))
+                        .build())
+//                .sorted(Comparator.comparing(Week::getWeek))
+                .collect(Collectors.toList());
     }
 
     private int calculateScore(float weight, int rating) {
@@ -129,16 +122,6 @@ public class ScoringService {
                 .setCategory(resultSet.getString("category"))
                 .setRating(resultSet.getInt("rating"))
                 .setWeight(resultSet.getFloat("weight"))
-                .setCreatedAt(parseDate(resultSet.getString("created_at")));
-    }
-
-    public static LocalDate parseDate(String dateString) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        return LocalDate.parse(dateString, dateTimeFormatter);
-    }
-
-    public Boolean isStartOfWeek(LocalDate date) {
-        return date.getDayOfWeek().equals(MONDAY);
+                .setCreatedAt(DateUtils.parseDate(resultSet.getString("created_at")));
     }
 }

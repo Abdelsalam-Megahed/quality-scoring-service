@@ -19,8 +19,14 @@ message Period {
 message CategoryScore {
   string category = 1;
   int32 ratings = 2;
-  int32 score = 4;
-  repeated Date dates = 3; //can be a date or a week
+  int32 score = 3;
+  repeated Date dates = 4;
+  repeated Week weeks = 5;
+}
+
+message Week {
+  string week = 1;
+  int32 score = 2;
 }
 
 message Date {
