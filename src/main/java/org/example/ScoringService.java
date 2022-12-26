@@ -1,9 +1,7 @@
 package org.example;
 
-import org.baeldung.grpc.CategoryScore;
-import org.baeldung.grpc.CategoryScoreResponse;
+import org.baeldung.grpc.*;
 import org.baeldung.grpc.Date;
-import org.baeldung.grpc.Week;
 import org.example.models.Rating;
 import org.example.repositry.ScoringRepositry;
 import org.example.utils.DateUtils;
@@ -31,6 +29,33 @@ public class ScoringService {
         return CategoryScoreResponse.newBuilder()
                 .addAllCategoryScoreList(categoryScoreList)
                 .build();
+    }
+
+    public ScoresByTicketResponse getScoresByTicket(String start, String end) {
+        LocalDate startDate = DateUtils.mapToLocalDate(start);
+        LocalDate endDate = DateUtils.mapToLocalDate(end);
+        List<Rating> ratings = scoringRepositry.getRatingsFromDB(startDate, endDate);
+        Map<Integer, List<Rating>> groupedRatingsByTicketId = ratings.stream().collect(Collectors.groupingBy(Rating::getTicketId));
+        List<ScoresByTicket> scoresByTicketList = buildScoresByTicketList(groupedRatingsByTicketId);
+
+        return ScoresByTicketResponse.newBuilder()
+                .addAllScoresByTicketList(scoresByTicketList)
+                .build();
+    }
+
+    private List<ScoresByTicket> buildScoresByTicketList(Map<Integer, List<Rating>> groupedRatingsByTicketId) {
+        return groupedRatingsByTicketId.entrySet().stream().map((group) -> {
+            List<Category> categories = group.getValue().stream().map(rating -> Category.newBuilder()
+                            .setCategory(rating.getCategory())
+                            .setScore(calculateScore(rating.getWeight(), rating.getRating()))
+                            .build())
+                    .collect(Collectors.toList());
+
+            return ScoresByTicket.newBuilder()
+                    .setTicketId(group.getKey())
+                    .addAllCategories(categories)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     private List<CategoryScore> buildCategoryScoreList(Map<String, List<Rating>> groupedRatingsByCategory, LocalDate startDate, LocalDate endDate) {

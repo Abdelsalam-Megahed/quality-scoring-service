@@ -30,4 +30,12 @@ public class ScoringServiceImpl extends ScoringServiceGrpc.ScoringServiceImplBas
         responseObserver.onNext(categoryScoreResponse);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void getScoresByTicket(Period request, StreamObserver<ScoresByTicketResponse> responseObserver) {
+        ScoresByTicketResponse scoresByTicketResponse = scoringService.getScoresByTicket(request.getStartDate(), request.getEndDate());
+
+        responseObserver.onNext(scoresByTicketResponse);
+        responseObserver.onCompleted();
+    }
 }
