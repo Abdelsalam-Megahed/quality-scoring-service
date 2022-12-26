@@ -8,6 +8,10 @@ public class DateUtils {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
+    public static LocalDate mapToLocalDate(String date) {
+        return LocalDate.parse(date, getDateFormat());
+    }
+
     public static LocalDate parseDate(String dateString) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
