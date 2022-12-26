@@ -52,8 +52,13 @@ message ScoresByTicketResponse {
   repeated ScoresByTicket scoresByTicketList = 1;
 }
 
+message OverallScoreResponse {
+  int32 score = 1;
+}
+
 service ScoringService {
   rpc hello(HelloRequest) returns(HelloResponse);
   rpc getCategoryScore(Period) returns (CategoryScoreResponse);
   rpc getScoresByTicket(Period) returns (ScoresByTicketResponse);
+  rpc getOverallScore(Period) returns (OverallScoreResponse);
 }
