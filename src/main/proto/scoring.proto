@@ -16,6 +16,13 @@ message Period {
   string endDate = 2;
 }
 
+message PeriodRange {
+  string startDate = 1;
+  string endDate = 2;
+  string secondStartDate = 3;
+  string secondEndDate = 4;
+}
+
 message CategoryScore {
   string category = 1;
   int32 ratings = 2;
@@ -61,4 +68,5 @@ service ScoringService {
   rpc getCategoryScore(Period) returns (CategoryScoreResponse);
   rpc getScoresByTicket(Period) returns (ScoresByTicketResponse);
   rpc getOverallScore(Period) returns (OverallScoreResponse);
+  rpc getOverallScoreChange(PeriodRange) returns(OverallScoreResponse);
 }

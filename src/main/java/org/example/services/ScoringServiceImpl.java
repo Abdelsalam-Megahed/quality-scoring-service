@@ -1,4 +1,4 @@
-package org.example;
+package org.example.services;
 
 import io.grpc.stub.StreamObserver;
 import org.baeldung.grpc.*;
@@ -36,6 +36,23 @@ public class ScoringServiceImpl extends ScoringServiceGrpc.ScoringServiceImplBas
         ScoresByTicketResponse scoresByTicketResponse = scoringService.getScoresByTicket(request.getStartDate(), request.getEndDate());
 
         responseObserver.onNext(scoresByTicketResponse);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getOverallScore(Period request, StreamObserver<OverallScoreResponse> responseObserver) {
+        OverallScoreResponse overallScoreResponse = scoringService.getOverallScore(request.getStartDate(), request.getEndDate());
+
+        responseObserver.onNext(overallScoreResponse);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getOverallScoreChange(PeriodRange request, StreamObserver<OverallScoreResponse> responseObserver) {
+        OverallScoreResponse overallScoreResponse = scoringService
+                .getOverallScoreChange(request.getStartDate(), request.getEndDate(), request.getSecondStartDate(), request.getSecondEndDate());
+
+        responseObserver.onNext(overallScoreResponse);
         responseObserver.onCompleted();
     }
 }

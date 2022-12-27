@@ -1,4 +1,4 @@
-package org.example;
+package org.example.services;
 
 import org.baeldung.grpc.*;
 import org.baeldung.grpc.Date;
@@ -41,6 +41,40 @@ public class ScoringService {
         return ScoresByTicketResponse.newBuilder()
                 .addAllScoresByTicketList(scoresByTicketList)
                 .build();
+    }
+
+    public OverallScoreResponse getOverallScore(String start, String end) {
+        LocalDate startDate = DateUtils.mapToLocalDate(start);
+        LocalDate endDate = DateUtils.mapToLocalDate(end);
+        int score = calculateScoreFromRatings(startDate, endDate);
+
+        return OverallScoreResponse.newBuilder()
+                .setScore(score)
+                .build();
+    }
+
+    public OverallScoreResponse getOverallScoreChange(String start, String end, String secondStart, String secondEnd) {
+        LocalDate startDate = DateUtils.mapToLocalDate(start);
+        LocalDate endDate = DateUtils.mapToLocalDate(end);
+        LocalDate secondStartDate = DateUtils.mapToLocalDate(secondStart);
+        LocalDate secondEndDate = DateUtils.mapToLocalDate(secondEnd);
+        int firstPeriodScore = calculateScoreFromRatings(startDate, endDate);
+        int secondPeriodScore = calculateScoreFromRatings(secondStartDate, secondEndDate);
+
+        return OverallScoreResponse.newBuilder()
+                .setScore(calculateScoreChange(firstPeriodScore, secondPeriodScore))
+                .build();
+    }
+
+    private int calculateScoreFromRatings(LocalDate startDate, LocalDate endDate) {
+        List<Rating> ratings = scoringRepositry.getRatingsFromDB(startDate, endDate);
+        List<Date> datesAndScores = ratings.stream()
+                .map(rating -> Date.newBuilder()
+                        .setDate(String.valueOf(rating.getCreatedAt()))
+                        .setScore(calculateScore(rating.getWeight(), rating.getRating()))
+                        .build())
+                .collect(Collectors.toList());
+        return getAverageScore(datesAndScores);
     }
 
     private List<ScoresByTicket> buildScoresByTicketList(Map<Integer, List<Rating>> groupedRatingsByTicketId) {
@@ -121,6 +155,10 @@ public class ScoringService {
 
     private int calculateScore(float weight, int rating) {
         return Math.round(weight * rating * 20);
+    }
+
+    private int calculateScoreChange(int firstScore, int secondScore) {
+        return 100 * (firstScore - secondScore) / secondScore;
     }
 
     private int getAverageScore(List<Date> dates) {

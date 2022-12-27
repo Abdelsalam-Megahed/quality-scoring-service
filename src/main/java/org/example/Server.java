@@ -2,6 +2,8 @@ package org.example;
 
 import io.grpc.ServerBuilder;
 import org.example.repositry.ScoringRepositry;
+import org.example.services.ScoringService;
+import org.example.services.ScoringServiceImpl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
