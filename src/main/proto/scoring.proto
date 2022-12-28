@@ -1,6 +1,6 @@
 syntax = "proto3";
 option java_multiple_files = true;
-package org.baeldung.grpc;
+package org.example.grpc;
 
 message HelloRequest {
   string firstName = 1;

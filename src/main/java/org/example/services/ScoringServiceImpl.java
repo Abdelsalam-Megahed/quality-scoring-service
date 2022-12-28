@@ -1,7 +1,7 @@
 package org.example.services;
 
 import io.grpc.stub.StreamObserver;
-import org.baeldung.grpc.*;
+import org.example.grpc.*;
 
 public class ScoringServiceImpl extends ScoringServiceGrpc.ScoringServiceImplBase {
     private final ScoringService scoringService;

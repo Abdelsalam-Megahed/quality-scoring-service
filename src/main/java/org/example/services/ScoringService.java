@@ -1,7 +1,7 @@
 package org.example.services;
 
-import org.baeldung.grpc.*;
-import org.baeldung.grpc.Date;
+import org.example.grpc.*;
+import org.example.grpc.Date;
 import org.example.models.Rating;
 import org.example.repositry.ScoringRepositry;
 import org.example.utils.DateUtils;

@@ -3,9 +3,9 @@ package org.example;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.baeldung.grpc.HelloRequest;
-import org.baeldung.grpc.HelloResponse;
-import org.baeldung.grpc.ScoringServiceGrpc;
+import org.example.grpc.HelloRequest;
+import org.example.grpc.HelloResponse;
+import org.example.grpc.ScoringServiceGrpc;
 
 public class Client {
     public static void main(String[] args) {
