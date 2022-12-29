@@ -127,8 +127,7 @@ public class ScoringService {
     }
 
     private List<Date> aggregateDailyScores(List<Date> dates) {
-        Map<String, List<Date>> groupedDatesByWeek = dates.stream().collect(
-                Collectors.groupingBy(Date::getDate));
+        Map<String, List<Date>> groupedDatesByWeek = dates.stream().collect(Collectors.groupingBy(Date::getDate));
 
         return groupedDatesByWeek.entrySet().stream().map(dateGroup -> Date.newBuilder()
                         .setDate(dateGroup.getKey())
@@ -140,17 +139,21 @@ public class ScoringService {
 
     private List<Week> aggregateWeeklyScores(List<Date> dates) {
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfYear();
-        Map<Integer, List<Date>> groupedDatesByWeek = dates.stream().collect(Collectors.groupingBy(
-                date -> LocalDate.parse(date.getDate()).get(weekOfYear), //TODO: make sure it's group by week and YEAR
-                LinkedHashMap::new,
-                Collectors.toList()
-        ));
 
-        return groupedDatesByWeek.entrySet().stream().map(weekAndDates -> Week.newBuilder()
-                        .setWeek(String.valueOf(weekAndDates.getKey()))
+        Map<Integer, Map<Integer, List<Date>>> groupedDatesByYearAndWeek = dates.stream().collect(
+                Collectors.groupingBy(
+                        date -> LocalDate.parse(date.getDate()).getYear(),
+                        Collectors.groupingBy(date -> LocalDate.parse(date.getDate()).get(weekOfYear))
+                )
+        );
+
+        return groupedDatesByYearAndWeek.entrySet().stream().flatMap(yearAndWeeks -> yearAndWeeks.getValue()
+                .entrySet().stream().map(weekAndDates -> Week.newBuilder()
+                        .setWeek(weekAndDates.getKey().toString())
+                        .setYear(yearAndWeeks.getKey().toString())
                         .setScore(getAverageScore(weekAndDates.getValue()))
                         .build())
-                .collect(Collectors.toList());
+        ).collect(Collectors.toList());
     }
 
     private int calculateScore(float weight, int rating) {

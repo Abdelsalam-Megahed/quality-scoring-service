@@ -19,7 +19,11 @@ public class ScoringRepository {
     }
 
     public List<Rating> getRatingsFromDB(LocalDate startDate, LocalDate endDate) {
-        String query = String.format("SELECT ratings.ticket_id, rating_categories.name AS category, rating_categories.weight AS weight, ratings.rating, substr(ratings.created_at, 1, 10) as created_at FROM ratings LEFT JOIN rating_categories ON ratings.rating_category_id = rating_categories.id WHERE (ratings.created_at BETWEEN DATE(\"%s\") AND DATE(\"%s\") AND rating_categories.weight > 0 AND rating NOT NULL ) GROUP BY Category, ratings.created_at ORDER BY ratings.created_at", startDate, endDate);
+        String query = String.format("SELECT ratings.ticket_id, rating_categories.name AS category, " +
+                "rating_categories.weight AS weight, ratings.rating, substr(ratings.created_at, 1, 10) as created_at " +
+                "FROM ratings LEFT JOIN rating_categories ON ratings.rating_category_id = rating_categories.id " +
+                "WHERE (ratings.created_at BETWEEN DATE(\"%s\") AND DATE(\"%s\") AND rating_categories.weight > 0 AND rating NOT NULL )" +
+                " GROUP BY Category, ratings.created_at ORDER BY ratings.created_at", startDate, endDate);
         List<Rating> ratings = new ArrayList<>();
 
         try (Statement stmt = connection.createStatement()) {

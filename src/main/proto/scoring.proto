@@ -33,7 +33,8 @@ message CategoryScore {
 
 message Week {
   string week = 1;
-  int32 score = 2;
+  string year = 2;
+  int32 score = 3;
 }
 
 message Date {
