@@ -1,26 +1,16 @@
 # Build stage
-FROM gradle:jdk8-jammy AS TEMP_BUILD_IMAGE
-
+FROM gradle:latest AS BUILD
 ENV APP_HOME=/usr/app/
-
 WORKDIR $APP_HOME
-
 COPY build.gradle settings.gradle $APP_HOME
-
+COPY . .
 RUN gradle build
 
-COPY . .
-
-# actual container
+# Package stage
 FROM openjdk:11-jre-slim
-
-ENV ARTIFACT_NAME=test-task-1.0-SNAPSHOT.jar
+ENV JAR_NAME=test-task-1.0-SNAPSHOT.jar
 ENV APP_HOME=/usr/app/
-
 WORKDIR $APP_HOME
-
-COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/$ARTIFACT_NAME .
-
+COPY --from=BUILD $APP_HOME .
 EXPOSE 8080
-
-ENTRYPOINT exec java -jar ${ARTIFACT_NAME}
+ENTRYPOINT exec java -jar $APP_HOME/build/libs/$JAR_NAME
