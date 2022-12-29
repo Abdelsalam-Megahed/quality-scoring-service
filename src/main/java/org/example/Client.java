@@ -3,9 +3,7 @@ package org.example;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.example.grpc.HelloRequest;
-import org.example.grpc.HelloResponse;
-import org.example.grpc.ScoringServiceGrpc;
+import org.example.grpc.*;
 
 public class Client {
     public static void main(String[] args) {
@@ -16,12 +14,22 @@ public class Client {
         ScoringServiceGrpc.ScoringServiceBlockingStub stub
                 = ScoringServiceGrpc.newBlockingStub(channel);
 
-        HelloResponse helloResponse = stub.hello(HelloRequest.newBuilder()
-                .setFirstName("karim")
-                .setLastName("gRPC")
-                .build());
+        HelloResponse helloResponse = stub.hello(
+                HelloRequest.newBuilder()
+                        .setFirstName("karim")
+                        .setLastName("gRPC")
+                        .build()
+        );
+
+        OverallScoreResponse overallScore = stub.getOverallScore(
+                Period.newBuilder()
+                        .setStartDate("2019-02-25")
+                        .setEndDate("2019-03-25")
+                        .build()
+        );
 
         System.out.println(helloResponse);
+        System.out.println("Overall score is: " + overallScore.getScore() + "%");
 
         channel.shutdown();
     }
