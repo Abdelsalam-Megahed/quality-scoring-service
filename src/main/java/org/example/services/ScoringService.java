@@ -3,7 +3,7 @@ package org.example.services;
 import org.example.grpc.*;
 import org.example.grpc.Date;
 import org.example.models.Rating;
-import org.example.repositry.ScoringRepositry;
+import org.example.repositories.ScoringRepository;
 import org.example.utils.DateUtils;
 
 import java.time.LocalDate;
@@ -13,16 +13,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ScoringService {
-    private final ScoringRepositry scoringRepositry;
+    private final ScoringRepository scoringRepository;
 
-    public ScoringService(ScoringRepositry scoringRepositry) {
-        this.scoringRepositry = scoringRepositry;
+    public ScoringService(ScoringRepository scoringRepository) {
+        this.scoringRepository = scoringRepository;
     }
 
     public CategoryScoreResponse getAggregatedCategoryScore(String start, String end) {
         LocalDate startDate = DateUtils.mapToLocalDate(start);
         LocalDate endDate = DateUtils.mapToLocalDate(end);
-        List<Rating> ratings = scoringRepositry.getRatingsFromDB(startDate, endDate);
+        List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
         Map<String, List<Rating>> groupedRatingsByCategory = ratings.stream().collect(Collectors.groupingBy(Rating::getCategory));
         List<CategoryScore> categoryScoreList = buildCategoryScoreList(groupedRatingsByCategory, startDate, endDate);
 
@@ -34,7 +34,7 @@ public class ScoringService {
     public ScoresByTicketResponse getScoresByTicket(String start, String end) {
         LocalDate startDate = DateUtils.mapToLocalDate(start);
         LocalDate endDate = DateUtils.mapToLocalDate(end);
-        List<Rating> ratings = scoringRepositry.getRatingsFromDB(startDate, endDate);
+        List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
         Map<Integer, List<Rating>> groupedRatingsByTicketId = ratings.stream().collect(Collectors.groupingBy(Rating::getTicketId));
         List<ScoresByTicket> scoresByTicketList = buildScoresByTicketList(groupedRatingsByTicketId);
 
@@ -67,7 +67,7 @@ public class ScoringService {
     }
 
     private int calculateScoreFromRatings(LocalDate startDate, LocalDate endDate) {
-        List<Rating> ratings = scoringRepositry.getRatingsFromDB(startDate, endDate);
+        List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
         List<Date> datesAndScores = ratings.stream()
                 .map(rating -> Date.newBuilder()
                         .setDate(String.valueOf(rating.getCreatedAt()))

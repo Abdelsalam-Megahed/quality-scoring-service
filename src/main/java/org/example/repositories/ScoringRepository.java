@@ -1,4 +1,4 @@
-package org.example.repositry;
+package org.example.repositories;
 
 import org.example.models.Rating;
 import org.example.utils.DateUtils;
@@ -11,10 +11,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScoringRepositry {
+public class ScoringRepository {
     private final Connection connection;
 
-    public ScoringRepositry(Connection connection) {
+    public ScoringRepository(Connection connection) {
         this.connection = connection;
     }
 
