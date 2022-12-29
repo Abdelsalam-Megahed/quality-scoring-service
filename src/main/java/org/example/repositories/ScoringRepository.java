@@ -41,6 +41,6 @@ public class ScoringRepository {
                 .setCategory(resultSet.getString("category"))
                 .setRating(resultSet.getInt("rating"))
                 .setWeight(resultSet.getFloat("weight"))
-                .setCreatedAt(DateUtils.parseDate(resultSet.getString("created_at")));
+                .setCreatedAt(DateUtils.mapToLocalDate(resultSet.getString("created_at")));
     }
 }
