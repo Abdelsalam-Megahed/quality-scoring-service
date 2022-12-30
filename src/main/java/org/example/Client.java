@@ -14,13 +14,6 @@ public class Client {
         ScoringServiceGrpc.ScoringServiceBlockingStub stub
                 = ScoringServiceGrpc.newBlockingStub(channel);
 
-        HelloResponse helloResponse = stub.hello(
-                HelloRequest.newBuilder()
-                        .setFirstName("karim")
-                        .setLastName("gRPC")
-                        .build()
-        );
-
         OverallScoreResponse overallScore = stub.getOverallScore(
                 Period.newBuilder()
                         .setStartDate("2019-02-25")
@@ -28,8 +21,17 @@ public class Client {
                         .build()
         );
 
-        System.out.println(helloResponse);
+        OverallScoreResponse overallScoreChange = stub.getOverallScoreChange(
+                PeriodRange.newBuilder()
+                        .setStartDate("2019-02-25")
+                        .setEndDate("2019-03-25")
+                        .setSecondStartDate("2019-05-25")
+                        .setSecondEndDate("2019-09-25")
+                        .build()
+        );
+
         System.out.println("Overall score is: " + overallScore.getScore() + "%");
+        System.out.println("Overall score change is: " + overallScoreChange.getScore() + "%");
 
         channel.shutdown();
     }

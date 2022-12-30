@@ -11,18 +11,6 @@ public class ScoringServiceImpl extends ScoringServiceGrpc.ScoringServiceImplBas
     }
 
     @Override
-    public void hello(HelloRequest request, StreamObserver<HelloResponse> responseObserver) {
-        String greeting = "hello, " + request.getFirstName() + " " + request.getLastName();
-
-        HelloResponse response = HelloResponse.newBuilder()
-                .setGreeting(greeting)
-                .build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
     public void getCategoryScore(Period request, StreamObserver<CategoryScoreResponse> responseObserver) {
         CategoryScoreResponse categoryScoreResponse = scoringService
                 .getAggregatedCategoryScore(request.getStartDate(), request.getEndDate());
