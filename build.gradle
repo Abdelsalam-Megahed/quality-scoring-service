@@ -47,6 +47,18 @@ protobuf {
     }
 }
 
+task client(type: CreateStartScripts) {
+    mainClassName = 'org.example.Client'
+    applicationName = 'client'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+applicationDistribution.into('bin') {
+    from(client)
+    fileMode = 0755
+}
+
 startScripts.enabled = false
 
 jar {

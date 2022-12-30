@@ -5,6 +5,7 @@ WORKDIR $APP_HOME
 COPY build.gradle settings.gradle $APP_HOME
 COPY . .
 RUN gradle build
+RUN gradle installDist
 
 # Package stage
 FROM openjdk:11-jre-slim
