@@ -13,8 +13,8 @@ public class Server {
         String connectionString = "jdbc:sqlite:database.db";
 
         try (Connection connection = DriverManager.getConnection(connectionString)) {
-            ScoringRepository scoringRepositry = new ScoringRepository(connection);
-            ScoringService scoringService = new ScoringService(scoringRepositry);
+            ScoringRepository scoringRepository = new ScoringRepository(connection);
+            ScoringService scoringService = new ScoringService(scoringRepository);
 
             io.grpc.Server server = ServerBuilder
                     .forPort(8080)
