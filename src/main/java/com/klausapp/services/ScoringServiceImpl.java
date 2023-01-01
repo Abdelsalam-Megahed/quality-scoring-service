@@ -1,7 +1,7 @@
-package org.example.services;
+package com.klausapp.services;
 
+import com.klausapp.grpc.*;
 import io.grpc.stub.StreamObserver;
-import org.example.grpc.*;
 
 public class ScoringServiceImpl extends ScoringServiceGrpc.ScoringServiceImplBase {
     private final ScoringService scoringService;

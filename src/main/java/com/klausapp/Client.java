@@ -1,9 +1,9 @@
-package org.example;
+package com.klausapp;
 
 
+import com.klausapp.grpc.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.example.grpc.*;
 
 public class Client {
     public static void main(String[] args) {

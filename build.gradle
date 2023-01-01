@@ -4,11 +4,11 @@ plugins {
     id 'application'
 }
 
-group = 'org.example'
+group = 'com.klausapp'
 description = 'test-task'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '11'
-mainClassName = 'org.example.Server'
+mainClassName = 'com.klausapp.Server'
 
 configurations {
     compileOnly {
@@ -48,7 +48,7 @@ protobuf {
 }
 
 task client(type: CreateStartScripts) {
-    mainClassName = 'org.example.Client'
+    mainClassName = 'com.klausapp.Client'
     applicationName = 'client'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = startScripts.classpath

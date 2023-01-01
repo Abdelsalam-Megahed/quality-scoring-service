@@ -1,4 +1,4 @@
-package org.example.utils;
+package com.klausapp.utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

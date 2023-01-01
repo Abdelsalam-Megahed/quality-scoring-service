@@ -1,4 +1,4 @@
-package org.example.models;
+package com.klausapp.models;
 
 import java.time.LocalDate;
 

@@ -1,9 +1,9 @@
-package org.example;
+package com.klausapp;
 
 import io.grpc.ServerBuilder;
-import org.example.repositories.ScoringRepository;
-import org.example.services.ScoringService;
-import org.example.services.ScoringServiceImpl;
+import com.klausapp.repositories.ScoringRepository;
+import com.klausapp.services.ScoringService;
+import com.klausapp.services.ScoringServiceImpl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

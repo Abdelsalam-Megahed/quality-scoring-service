@@ -1,10 +1,10 @@
-package org.example.services;
+package com.klausapp.services;
 
-import org.example.grpc.*;
-import org.example.grpc.Date;
-import org.example.models.Rating;
-import org.example.repositories.ScoringRepository;
-import org.example.utils.DateUtils;
+import com.klausapp.grpc.*;
+import com.klausapp.grpc.Date;
+import com.klausapp.repositories.ScoringRepository;
+import com.klausapp.utils.DateUtils;
+import com.klausapp.models.Rating;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;

@@ -1,7 +1,7 @@
-package org.example.repositories;
+package com.klausapp.repositories;
 
-import org.example.models.Rating;
-import org.example.utils.DateUtils;
+import com.klausapp.utils.DateUtils;
+import com.klausapp.models.Rating;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
