@@ -1,8 +1,6 @@
 # Build stage
 FROM gradle:latest AS BUILD
-ENV APP_HOME=/usr/app/
-WORKDIR $APP_HOME
-COPY build.gradle settings.gradle $APP_HOME
+WORKDIR /usr/app/
 COPY . .
 RUN gradle build
 RUN gradle installDist
