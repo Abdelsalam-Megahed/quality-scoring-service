@@ -75,7 +75,7 @@ public class ScoringService {
                         .build())
                 .collect(Collectors.toList());
 
-        return getAggregatedDailyScore(datesAndScoresList);
+        return calculateAggregatedScore(datesAndScoresList);
     }
 
     private List<ScoresByTicket> buildScoresByTicketList(Map<Integer, List<Rating>> groupedRatingsByTicketId) {
@@ -111,8 +111,8 @@ public class ScoringService {
             }
 
             int aggregatedScore = isPeriodLongerThanOneMonth
-                    ? getAggregatedWeeklyScore(weeklyList)
-                    : getAggregatedDailyScore(dailyList);
+                    ? calculateAggregatedWeeklyScore(weeklyList)
+                    : calculateAggregatedScore(dailyList);
             int aggregatedRating = getAggregatedRating(ratingGroup.getValue());
 
             return CategoryScore.newBuilder()
@@ -130,7 +130,7 @@ public class ScoringService {
 
         return groupedDatesByWeek.entrySet().stream().map(dateGroup -> Date.newBuilder()
                         .setDate(dateGroup.getKey())
-                        .setScore(getAggregatedDailyScore(dateGroup.getValue()))
+                        .setScore(calculateAggregatedScore(dateGroup.getValue()))
                         .build()).collect(Collectors.toList()).stream()
                 .sorted(Comparator.comparing(Date::getDate))
                 .collect(Collectors.toList());
@@ -150,7 +150,7 @@ public class ScoringService {
                 .entrySet().stream().map(weekAndDates -> Week.newBuilder()
                         .setWeek(weekAndDates.getKey().toString())
                         .setYear(yearAndWeeks.getKey().toString())
-                        .setScore(getAggregatedDailyScore(weekAndDates.getValue()))
+                        .setScore(calculateAggregatedScore(weekAndDates.getValue()))
                         .build())
         ).collect(Collectors.toList());
     }
@@ -168,14 +168,14 @@ public class ScoringService {
                 .reduce(0, (total, rating) -> total + rating.getRating(), Integer::sum);
     }
 
-    private int getAggregatedDailyScore(List<Date> datesAndScoresList) {
+    private int calculateAggregatedScore(List<Date> datesAndScoresList) {
         int totalScore = datesAndScoresList.stream().reduce(0,
                 (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
 
         return totalScore / datesAndScoresList.size();
     }
 
-    private int getAggregatedWeeklyScore(List<Week> weeksAndScoresList) {
+    private int calculateAggregatedWeeklyScore(List<Week> weeksAndScoresList) {
         int totalScore = weeksAndScoresList.stream().reduce(0,
                 (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
 
