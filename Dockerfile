@@ -7,7 +7,7 @@ RUN gradle installDist
 
 # Package stage
 FROM openjdk:11-jre-slim
-ENV JAR_NAME=test-task-1.0-SNAPSHOT.jar
+ENV JAR_NAME=scoring-service-1.0-SNAPSHOT.jar
 ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
 COPY --from=BUILD $APP_HOME .

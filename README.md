@@ -1,10 +1,10 @@
 ## Usage
 
-- Clone the project
-- Make sure port `8080` is not in use on your local machine
-- Go to project directory on your local and run `docker compose up`
-- In order to run the client, you can go to the container terminal and run `./build/install/test-task/bin/client`
-- For quick testing, I would recommend installing an RPC client like BloomRPC
+1. Clone the project
+2. Make sure port `8080` is not in use on your local machine
+3. Go to project directory on your local and run `docker compose up`
+4. In order to run the client, you can go to the container terminal and run `./build/install/scoring-service/bin/client`
+5. For quick testing, I would recommend installing an RPC client like BloomRPC
 
 # Software Engineer Test Task
 
