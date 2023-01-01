@@ -68,26 +68,26 @@ public class ScoringService {
 
     private int calculateScoreFromRatings(LocalDate startDate, LocalDate endDate) {
         List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
-        List<Date> datesAndScores = ratings.stream()
+        List<Date> datesAndScoresList = ratings.stream()
                 .map(rating -> Date.newBuilder()
-                        .setDate(String.valueOf(rating.getCreatedAt()))
+                        .setDate(rating.getCreatedAt().toString())
                         .setScore(calculateScore(rating.getWeight(), rating.getRating()))
                         .build())
                 .collect(Collectors.toList());
-        return getAverageScore(datesAndScores);
+
+        return getAggregatedDailyScore(datesAndScoresList);
     }
 
     private List<ScoresByTicket> buildScoresByTicketList(Map<Integer, List<Rating>> groupedRatingsByTicketId) {
         return groupedRatingsByTicketId.entrySet().stream().map((group) -> {
-            List<Category> categories = group.getValue().stream().map(rating -> Category.newBuilder()
-                            .setCategory(rating.getCategory())
-                            .setScore(calculateScore(rating.getWeight(), rating.getRating()))
-                            .build())
-                    .collect(Collectors.toList());
+            List<Category> categoriesAndScoresList = group.getValue().stream().map(rating -> Category.newBuilder()
+                    .setCategory(rating.getCategory())
+                    .setScore(calculateScore(rating.getWeight(), rating.getRating()))
+                    .build()).collect(Collectors.toList());
 
             return ScoresByTicket.newBuilder()
                     .setTicketId(group.getKey())
-                    .addAllCategories(categories)
+                    .addAllCategories(categoriesAndScoresList)
                     .build();
         }).collect(Collectors.toList());
     }
@@ -97,47 +97,46 @@ public class ScoringService {
             List<Week> weeklyList = new ArrayList<>();
             List<Date> dailyList = new ArrayList<>();
             boolean isPeriodLongerThanOneMonth = DateUtils.isPeriodLongerThanOneMonth(startDate, endDate);
-            List<Date> dates = ratingGroup.getValue().stream()
+            List<Date> datesAndScoresList = ratingGroup.getValue().stream()
                     .map(rating -> Date.newBuilder()
-                            .setDate(String.valueOf(rating.getCreatedAt()))
+                            .setDate(rating.getCreatedAt().toString())
                             .setScore(calculateScore(rating.getWeight(), rating.getRating()))
                             .build())
                     .collect(Collectors.toList());
 
             if (isPeriodLongerThanOneMonth) {
-                weeklyList = aggregateWeeklyScores(dates);
+                weeklyList = getAggregatedWeeklyList(datesAndScoresList);
             } else {
-                dailyList = aggregateDailyScores(dates);
+                dailyList = getAggregatedDailyList(datesAndScoresList);
             }
 
-            int overallAverageScore = isPeriodLongerThanOneMonth
-                    ? getAverageWeeklyScore(weeklyList)
-                    : getAverageScore(dailyList);
-            int overallRating = ratingGroup.getValue().stream()
-                    .reduce(0, (total, rating) -> total + rating.getRating(), Integer::sum);
+            int aggregatedScore = isPeriodLongerThanOneMonth
+                    ? getAggregatedWeeklyScore(weeklyList)
+                    : getAggregatedDailyScore(dailyList);
+            int aggregatedRating = getAggregatedRating(ratingGroup.getValue());
 
             return CategoryScore.newBuilder()
                     .setCategory(ratingGroup.getKey())
-                    .setScore(overallAverageScore)
-                    .setRatings(overallRating)
+                    .setScore(aggregatedScore)
+                    .setRatings(aggregatedRating)
                     .addAllDates(dailyList)
                     .addAllWeeks(weeklyList)
                     .build();
         }).collect(Collectors.toList());
     }
 
-    private List<Date> aggregateDailyScores(List<Date> dates) {
+    private List<Date> getAggregatedDailyList(List<Date> dates) {
         Map<String, List<Date>> groupedDatesByWeek = dates.stream().collect(Collectors.groupingBy(Date::getDate));
 
         return groupedDatesByWeek.entrySet().stream().map(dateGroup -> Date.newBuilder()
                         .setDate(dateGroup.getKey())
-                        .setScore(getAverageScore(dateGroup.getValue()))
+                        .setScore(getAggregatedDailyScore(dateGroup.getValue()))
                         .build()).collect(Collectors.toList()).stream()
                 .sorted(Comparator.comparing(Date::getDate))
                 .collect(Collectors.toList());
     }
 
-    private List<Week> aggregateWeeklyScores(List<Date> dates) {
+    private List<Week> getAggregatedWeeklyList(List<Date> dates) {
         TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfYear();
 
         Map<Integer, Map<Integer, List<Date>>> groupedDatesByYearAndWeek = dates.stream().collect(
@@ -151,30 +150,35 @@ public class ScoringService {
                 .entrySet().stream().map(weekAndDates -> Week.newBuilder()
                         .setWeek(weekAndDates.getKey().toString())
                         .setYear(yearAndWeeks.getKey().toString())
-                        .setScore(getAverageScore(weekAndDates.getValue()))
+                        .setScore(getAggregatedDailyScore(weekAndDates.getValue()))
                         .build())
         ).collect(Collectors.toList());
     }
 
     private int calculateScore(float weight, int rating) {
-        return Math.round(weight * rating * 20);
+        return Math.round(weight * rating * 15);
     }
 
     private int calculateScoreChange(int firstScore, int secondScore) {
         return 100 * (firstScore - secondScore) / secondScore;
     }
 
-    private int getAverageScore(List<Date> dates) {
-        return (int) dates.stream()
-                .mapToInt(Date::getScore)
-                .average()
-                .orElse(0);
+    private Integer getAggregatedRating(List<Rating> ratingGroup) {
+        return ratingGroup.stream()
+                .reduce(0, (total, rating) -> total + rating.getRating(), Integer::sum);
     }
 
-    private int getAverageWeeklyScore(List<Week> dates) {
-        return (int) dates.stream()
-                .mapToInt(Week::getScore)
-                .average()
-                .orElse(0);
+    private int getAggregatedDailyScore(List<Date> datesAndScoresList) {
+        int totalScore = datesAndScoresList.stream()
+                .reduce(0, (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
+
+        return totalScore / datesAndScoresList.size();
+    }
+
+    private int getAggregatedWeeklyScore(List<Week> weeksAndScoresList) {
+        int totalScore = weeksAndScoresList.stream()
+                .reduce(0, (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
+
+        return totalScore / weeksAndScoresList.size();
     }
 }
