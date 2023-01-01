@@ -55,9 +55,13 @@ message OverallScoreResponse {
   int32 score = 1;
 }
 
+message OverallScoreChangeResponse {
+  int32 scoreChange = 1;
+}
+
 service ScoringService {
   rpc getCategoryScore(Period) returns (CategoryScoreResponse);
   rpc getScoresByTicket(Period) returns (ScoresByTicketResponse);
   rpc getOverallScore(Period) returns (OverallScoreResponse);
-  rpc getOverallScoreChange(PeriodRange) returns(OverallScoreResponse);
+  rpc getOverallScoreChange(PeriodRange) returns(OverallScoreChangeResponse);
 }

@@ -21,7 +21,7 @@ public class Client {
                         .build()
         );
 
-        OverallScoreResponse overallScoreChange = stub.getOverallScoreChange(
+        OverallScoreChangeResponse overallScoreChange = stub.getOverallScoreChange(
                 PeriodRange.newBuilder()
                         .setStartDate("2019-02-25")
                         .setEndDate("2019-03-25")
@@ -31,7 +31,7 @@ public class Client {
         );
 
         System.out.println("Overall score is: " + overallScore.getScore() + "%");
-        System.out.println("Overall score change is: " + overallScoreChange.getScore() + "%");
+        System.out.println("Overall score change is: " + overallScoreChange.getScoreChange() + "%");
 
         channel.shutdown();
     }

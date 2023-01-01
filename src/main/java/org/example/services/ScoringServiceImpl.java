@@ -36,11 +36,11 @@ public class ScoringServiceImpl extends ScoringServiceGrpc.ScoringServiceImplBas
     }
 
     @Override
-    public void getOverallScoreChange(PeriodRange request, StreamObserver<OverallScoreResponse> responseObserver) {
-        OverallScoreResponse overallScoreResponse = scoringService
+    public void getOverallScoreChange(PeriodRange request, StreamObserver<OverallScoreChangeResponse> responseObserver) {
+        OverallScoreChangeResponse overallScoreChangeResponse = scoringService
                 .getOverallScoreChange(request.getStartDate(), request.getEndDate(), request.getSecondStartDate(), request.getSecondEndDate());
 
-        responseObserver.onNext(overallScoreResponse);
+        responseObserver.onNext(overallScoreChangeResponse);
         responseObserver.onCompleted();
     }
 }

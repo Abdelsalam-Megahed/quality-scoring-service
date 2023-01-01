@@ -53,7 +53,7 @@ public class ScoringService {
                 .build();
     }
 
-    public OverallScoreResponse getOverallScoreChange(String start, String end, String secondStart, String secondEnd) {
+    public OverallScoreChangeResponse getOverallScoreChange(String start, String end, String secondStart, String secondEnd) {
         LocalDate startDate = DateUtils.mapToLocalDate(start);
         LocalDate endDate = DateUtils.mapToLocalDate(end);
         LocalDate secondStartDate = DateUtils.mapToLocalDate(secondStart);
@@ -61,8 +61,8 @@ public class ScoringService {
         int firstPeriodScore = calculateScoreFromRatings(startDate, endDate);
         int secondPeriodScore = calculateScoreFromRatings(secondStartDate, secondEndDate);
 
-        return OverallScoreResponse.newBuilder()
-                .setScore(calculateScoreChange(firstPeriodScore, secondPeriodScore))
+        return OverallScoreChangeResponse.newBuilder()
+                .setScoreChange(calculateScoreChange(firstPeriodScore, secondPeriodScore))
                 .build();
     }
 
@@ -169,15 +169,15 @@ public class ScoringService {
     }
 
     private int getAggregatedDailyScore(List<Date> datesAndScoresList) {
-        int totalScore = datesAndScoresList.stream()
-                .reduce(0, (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
+        int totalScore = datesAndScoresList.stream().reduce(0,
+                (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
 
         return totalScore / datesAndScoresList.size();
     }
 
     private int getAggregatedWeeklyScore(List<Week> weeksAndScoresList) {
-        int totalScore = weeksAndScoresList.stream()
-                .reduce(0, (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
+        int totalScore = weeksAndScoresList.stream().reduce(0,
+                (total, dateAndScore) -> total + dateAndScore.getScore(), Integer::sum);
 
         return totalScore / weeksAndScoresList.size();
     }
