@@ -22,7 +22,7 @@ public class ScoringService {
     public CategoryScoreResponse getAggregatedCategoryScore(String start, String end) {
         LocalDate startDate = DateUtils.mapToLocalDate(start);
         LocalDate endDate = DateUtils.mapToLocalDate(end);
-        List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
+        List<Rating> ratings = scoringRepository.getRatings(startDate, endDate);
         Map<String, List<Rating>> groupedRatingsByCategory = ratings.stream().collect(Collectors.groupingBy(Rating::getCategory));
         List<CategoryScore> categoryScoreList = buildCategoryScoreList(groupedRatingsByCategory, startDate, endDate);
 
@@ -34,7 +34,7 @@ public class ScoringService {
     public ScoresByTicketResponse getScoresByTicket(String start, String end) {
         LocalDate startDate = DateUtils.mapToLocalDate(start);
         LocalDate endDate = DateUtils.mapToLocalDate(end);
-        List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
+        List<Rating> ratings = scoringRepository.getRatings(startDate, endDate);
         Map<Integer, List<Rating>> groupedRatingsByTicketId = ratings.stream().collect(Collectors.groupingBy(Rating::getTicketId));
         List<ScoresByTicket> scoresByTicketList = buildScoresByTicketList(groupedRatingsByTicketId);
 
@@ -67,7 +67,7 @@ public class ScoringService {
     }
 
     private int calculateScoreFromRatings(LocalDate startDate, LocalDate endDate) {
-        List<Rating> ratings = scoringRepository.getRatingsFromDB(startDate, endDate);
+        List<Rating> ratings = scoringRepository.getRatings(startDate, endDate);
         List<Date> datesAndScoresList = ratings.stream()
                 .map(rating -> Date.newBuilder()
                         .setDate(rating.getCreatedAt().toString())

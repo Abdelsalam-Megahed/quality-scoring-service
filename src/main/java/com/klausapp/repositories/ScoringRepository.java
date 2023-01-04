@@ -18,7 +18,7 @@ public class ScoringRepository {
         this.connection = connection;
     }
 
-    public List<Rating> getRatingsFromDB(LocalDate startDate, LocalDate endDate) {
+    public List<Rating> getRatings(LocalDate startDate, LocalDate endDate) {
         String query = String.format("SELECT ratings.ticket_id, rating_categories.name AS category, " +
                 "rating_categories.weight AS weight, ratings.rating, substr(ratings.created_at, 1, 10) as created_at " +
                 "FROM ratings LEFT JOIN rating_categories ON ratings.rating_category_id = rating_categories.id " +
