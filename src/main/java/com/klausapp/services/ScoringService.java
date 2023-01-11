@@ -169,6 +169,10 @@ public class ScoringService {
     }
 
     private int calculateAggregatedScore(List<DateScoreObject> dateScoreList) {
+        if (dateScoreList.isEmpty()) {
+            return 0;
+        }
+
         int totalScore = dateScoreList.stream().reduce(0,
                 (total, dateScoreObject) -> total + dateScoreObject.getScore(), Integer::sum);
 
@@ -176,6 +180,10 @@ public class ScoringService {
     }
 
     private int calculateAggregatedWeeklyScore(List<WeekScoreObject> weekScoreList) {
+        if (weekScoreList.isEmpty()) {
+            return 0;
+        }
+
         int totalScore = weekScoreList.stream().reduce(0,
                 (total, dateScoreObject) -> total + dateScoreObject.getScore(), Integer::sum);
 
