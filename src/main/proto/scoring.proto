@@ -18,17 +18,17 @@ message CategoryScore {
   string category = 1;
   int32 ratings = 2;
   int32 score = 3;
-  repeated Date dates = 4;
-  repeated Week weeks = 5;
+  repeated DateScoreObject dates = 4;
+  repeated WeekScoreObject weeks = 5;
 }
 
-message Week {
+message WeekScoreObject {
   string week = 1;
   string year = 2;
   int32 score = 3;
 }
 
-message Date {
+message DateScoreObject {
   string date = 1;
   int32 score = 2;
 }
