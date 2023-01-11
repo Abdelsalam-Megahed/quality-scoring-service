@@ -1,10 +1,24 @@
-## Usage
+### Usage
 
 1. Clone the project
 2. Make sure port `8080` is not in use on your local machine
 3. Go to project directory on your local and run `docker compose up`
 4. In order to run the client, you can go to the container terminal and run `./build/install/scoring-service/bin/client`
 5. For quick testing, I would recommend installing an RPC client like BloomRPC
+
+### Documentation of the work done
+
+- Docker was chosen as a container solution, tried to make setup as clean and smooth as possible.
+- Stack consists of Java, Gradle and gRPC.
+- Scoring algorithm of a single rating is: weight * rating * constant (constant purpose is to convert output to a
+  percentage).
+- Aggregated score: sum of all score list based on the equation above / size of the score list.
+- Heavy use of Java streams was made in order to group rating by date or ticket id.
+
+### Improvements
+
+- Unit and integration tests
+- Input validation
 
 # Software Engineer Test Task
 
